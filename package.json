@@ -24,7 +24,11 @@
   "author": "Blake Johnston",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "chance": "^1.0.11",
     "express": "^4.13.3",
-    "mongodb": "^2.0.42"
+    "mongodb": "^2.0.42",
+    "mustache": "^2.3.0"
   }
 }
