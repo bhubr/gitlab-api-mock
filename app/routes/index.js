@@ -1,10 +1,12 @@
 'use strict';
 
 var ProjectHandler = require(process.cwd() + '/app/controllers/projectHandler.server.js');
+var IssueHandler = require(process.cwd() + '/app/controllers/issueHandler.server.js');
 var seed = require('../../utils/seed');
 
 module.exports = function (app, db) {
   var projectHandler = new ProjectHandler(db);
+  var issueHandler = new IssueHandler(db);
 
   app.route('/')
       .get(function (req, res) {
@@ -27,5 +29,20 @@ module.exports = function (app, db) {
       .get(projectHandler.getProject)
       .put(projectHandler.updateProject)
       .delete(projectHandler.deleteProject);
+
+  app.route('/api/v4/projects/:id/issues')
+      .get(issueHandler.getProjectIssues);
+
+  app.route('/api/v4/projects/:id/issues/:iid')
+      .get(issueHandler.getProjectIssue)
+      .put(issueHandler.updateProjectIssue);
+
+  app.route('/api/v4/issues')
+      .get(issueHandler.getAllIssues);
+
+  // app.route('/api/v4/issues/:id')
+  //     .get(issueHandler.getIssue)
+  //     .put(issueHandler.updateIssue)
+  //     .delete(issueHandler.deleteIssue);
 
 };
