@@ -7,11 +7,12 @@
    var clickNbr = document.querySelector('#click-nbr');
    var apiUrl = 'http://localhost:3000/api/v4';
 
+   var $overlay = $('#overlay');
+
    var $projEditor = $('#project-editor');
    var $projForm = $projEditor.find('form');
    var $inputProjName = $projForm.find('input[name="name_with_namespace"]');
    var $inputProjId = $projForm.find('input[name="project_id"]');
-
 
    var $issueEditor = $('#issue-editor');
    var $issueForm = $issueEditor.find('form');
@@ -35,6 +36,7 @@
    function openProjectEditor(evt) {
       var value = evt.target.innerHTML;
       $projEditor.removeClass('hidden');
+      $overlay.removeClass('hidden');
       $inputProjName.val(value);
       $inputProjId.val($(evt.target).data('id'));
    }
@@ -42,6 +44,7 @@
    function openIssueEditor(evt) {
       var value = evt.target.innerHTML;
       $issueEditor.removeClass('hidden');
+      $overlay.removeClass('hidden');
       $inputIssueTitle.val(value);
       $inputIssueDesc.val($(evt.target).data('description'));
       $inputIssueIid.val($(evt.target).data('iid'));
@@ -64,6 +67,7 @@
    function submitProjectName(evt) {
       evt.preventDefault();
       $projEditor.addClass('hidden');
+      $overlay.addClass('hidden');
       var id = $inputProjId.val();
       var name = $inputProjName.val();
       ajaxPut(apiUrl + '/projects/' + id,
@@ -77,6 +81,7 @@
    function submitIssue(evt) {
       evt.preventDefault();
       $issueEditor.addClass('hidden');
+      $overlay.addClass('hidden');
       var iid = $inputIssueIid.val();
       var projectId = $inputIssuePid.val();
       var title = $inputIssueTitle.val();
