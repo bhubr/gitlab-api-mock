@@ -17,8 +17,15 @@ mongo.connect('mongodb://localhost:27017/gitlabapi', function (err, db) {
       console.log('Successfully connected to MongoDB on port 27017.');
    }
 
+   app.use(function(req, res, next) {
+     res.header("Access-Control-Allow-Origin", "*");
+     res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+     next();
+   });
    app.use('/public', express.static(process.cwd() + '/public'));
    app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
+
 
    routes(app, db);
    seed(db);

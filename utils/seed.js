@@ -7,12 +7,15 @@ var fs = require('fs');
 var issueTemplate = fs.readFileSync(__dirname + '/issue-template.json').toString();
 var projectTemplate = fs.readFileSync(__dirname + '/project-template.json').toString();
 var words = require(__dirname + '/words.json');
-var NUM = 5;
+var NUM_PROJECTS = 5;
+var NUM_ISSUES_PER_PROJ = 6;
 var INIT_AUTOINC_PROJ = 4000;
+var INIT_AUTOINC_ISSUE = 13000;
+var SEED_FILE = 'seed.json';
 var projectAutoIdx = INIT_AUTOINC_PROJ;
-var INIT_AUTOINC_ISSUE = 100000;
-var issueAutoIdx = INIT_AUTOINC_PROJ;
+var issueAutoIdx = INIT_AUTOINC_ISSUE;
 var issueSeedIid = 0;
+var seed;
 
 Mustache.parse(projectTemplate);
 
@@ -35,7 +38,8 @@ function randomizeUser() {
 function randomizeIssue() {
   return {
     id: ++issueAutoIdx,
-    iid: ++issueSeedIid
+    iid: ++issueSeedIid,
+    title: chance.pick(words.verbs) + ' ' + chance.pick(words.adjectives) + ' ' + chance.pick(words.monsters)
   }
 }
 
@@ -62,15 +66,13 @@ function getPopulatedProjectTemplate() {
 }
 
 function getPopulatedIssueTemplate(project) {
-  console.log(project);
   var json = Mustache.render(issueTemplate, getIssueData(project));
-  console.log(json);
   return JSON.parse(json);
 }
 
 function getProjectSeeds() {
   var projectSeeds = [];
-  for(i = 0 ; i < NUM ; i++) {
+  for(i = 0 ; i < NUM_PROJECTS ; i++) {
     projectSeeds.push(getPopulatedProjectTemplate());
   }
   return projectSeeds;
@@ -79,19 +81,43 @@ function getProjectSeeds() {
 function getIssueSeeds(projSeed) {
   var issueSeeds = [];
   issueSeedIid = 0;
-  for(i = 0 ; i < NUM ; i++) {
+  for(i = 0 ; i < NUM_ISSUES_PER_PROJ ; i++) {
     issueSeeds.push(getPopulatedIssueTemplate(projSeed));
   }
   return issueSeeds;
 }
 
+function generateSeedFile() {
+  seed = {
+    projects: getProjectSeeds(),
+    issues: []
+  };
+  seed.projects.forEach( proj => {
+    seed.issues = seed.issues.concat( getIssueSeeds( proj ) )
+  } );
+  fs.writeFileSync( SEED_FILE, JSON.stringify( seed ) );
+}
+
+if( ! fs.existsSync( SEED_FILE ) ) {
+  generateSeedFile();
+}
+else {
+  seed = JSON.parse(
+    fs.readFileSync( SEED_FILE ).toString()
+  );
+}
+
+
 // console.log(words, getPopulatedProjectTemplate());
-module.exports = function(db) {
-  projectAutoIdx = INIT_AUTOINC_PROJ;
-  issueAutoIdx = INIT_AUTOINC_ISSUE;
+module.exports = function reset(db) {
+  // projectAutoIdx = INIT_AUTOINC_PROJ;
+  // issueAutoIdx = INIT_AUTOINC_ISSUE;
 
   var projects = db.collection('projects');
   var issues = db.collection('issues');
+  projects.remove();
+  issues.remove();
+  console.log('removed all');
 
   function insertProjectAsync(data) {
     return new Promise((resolve, reject) => {
@@ -111,22 +137,15 @@ module.exports = function(db) {
     });
   }
 
-  projects.remove();
-  issues.remove();
   return Promise.reduce(
-    getProjectSeeds(),
-    (carry, projSeed) =>
-      insertProjectAsync(projSeed)
-      .then(project => Promise.reduce(
-        getIssueSeeds(projSeed), 
-        (carry, issueSeed) => insertIssueAsync(issueSeed), []
-      )
-    ), []
+    seed.projects,
+    (carry, projSeed) => insertProjectAsync(projSeed),
+    []
   )
-  .then(fakeProjects => {
-    // console.log(fakeProjects.map((proj, i) => {
-    //   return seeds[i].id + ' ' + seeds[i].name_with_namespace;
-    // }));
-  })
+  .then(() => Promise.reduce(
+    seed.issues,
+    (carry, issueSeed) => insertIssueAsync(issueSeed),
+    []
+  ))
 
 };

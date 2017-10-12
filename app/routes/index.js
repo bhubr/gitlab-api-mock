@@ -14,7 +14,6 @@ module.exports = function (app, db) {
       });
 
   app.post('/reset', function(req, res) {
-      console.log('RESET HIT');
       seed(db)
       .then(projects => res.json(projects));
   })

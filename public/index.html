@@ -5,26 +5,50 @@
    <head>
       <title>Clementine.js - The elegant and lightweight full-stack boilerplate.</title>
       <link href="http://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet" type="text/css">
-      <link href="/public/css/main.css" rel="stylesheet" type="text/css">  
+      <link href="/public/css/main.css" rel="stylesheet" type="text/css">
+
    </head>
 
    <body>
       <div class="container">
-         <img src="/public/img/clementine_150.png" />
+         <img style="width: 500px" src="https://about.gitlab.com/images/press/logo/wm_no_bg.svg" />
          <br />
-         <p class="clementine-text">Clementine.js</p>
       </div>
 
       <div class="container">
-         <p>You have clicked the button <span id="click-nbr"></span> times.</p>   
-         <br />
-         <div class="btn-container">
-            <button type="submit" class="btn btn-add">CLICK ME!</button>
-            <button class="btn btn-delete">RESET</button>
+         <div class="col">
+            <h3>Projects</h3>
+            <ul id="projects">
+            </ul>
+         </div>
+         <div class="col">
+            <h3>Issues</h3>
+            <ul id="issues">
+            </ul>
          </div>
       </div>
 
-      <script type="text/javascript" src="/controllers/clickController.client.js"></script>   
+      <div id="project-editor" class="editor hidden">
+         <h4>Edit project</h4>
+         <form>
+            <input name="name_with_namespace" /><br>
+            <input name="project_id" type="hidden" />
+            <button class="btn" type="submit">ok</button>
+         </form>
+      </div>
+
+      <div id="issue-editor" class="editor hidden">
+         <h4>Edit issue</h4>
+         <form>
+            <input name="title" /><br>
+            <textarea name="description"></textarea><br>
+            <input name="issue_iid" type="hidden" />
+            <input name="issue_pid" type="hidden" />
+            <button class="btn" type="submit">ok</button>
+         </form>
+      </div>
+      <script type="text/javascript" src="/public/js/zepto.min.js"></script>
+      <script type="text/javascript" src="/public/js/client.js"></script>
    </body>
 
 </html>

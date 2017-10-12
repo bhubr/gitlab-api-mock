@@ -1,11 +1,18 @@
 'use strict';
 
+function dumpItem(item) {
+   console.log( item.id + '. ' + item.title + '\n' );
+}
+function dumpItems(label, items) {
+   console.log('#### ' + label + ' ####\n');
+   items.forEach(dumpItem);
+}
+
 function issueHandler (db) {
    var issues = db.collection('issues');
 
    this.getProjectIssues = function (req, res) {
 
-      // var issueProjection = { '_id': false };
 
       issues.find({ project_id: parseInt(req.params.id) }).toArray(function (err, records) {
          if (err) {
@@ -16,6 +23,9 @@ function issueHandler (db) {
             records.forEach((record, idx) => {
                delete records[idx]._id;
             });
+
+            dumpItems('getProjectIssues for proj id ' + req.params.id, records);
+            // res.set("Access-Control-Allow-Origin", "*");
             res.json(records);
          }
       });
@@ -24,7 +34,7 @@ function issueHandler (db) {
    this.getAllIssues = function (req, res) {
 
       // var issueProjection = { '_id': false };
-      console.log('getAllIssues', req.query);
+      // console.log('getAllIssues', req.query);   
 
       issues.find({  }).toArray(function (err, records) {
          if (err) {
@@ -35,6 +45,7 @@ function issueHandler (db) {
             records.forEach((record, idx) => {
                delete records[idx]._id;
             });
+            // res.set("Access-Control-Allow-Origin", "*");
             res.json(records);
          }
       });

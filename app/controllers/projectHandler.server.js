@@ -1,5 +1,13 @@
 'use strict';
 
+function dumpItem(item) {
+   console.log( item.id + '. ' + item.name_with_namespace + '\n' );
+}
+function dumpItems(label, items) {
+   console.log('#### ' + label + ' ####\n');
+   items.forEach(dumpItem);
+}
+
 function projectHandler (db) {
    var projects = db.collection('projects');
 
@@ -16,6 +24,8 @@ function projectHandler (db) {
             records.forEach((record, idx) => {
                delete records[idx]._id;
             });
+            dumpItems('getProjects', records);
+            // res.set("Access-Control-Allow-Origin", "*");
             res.json(records);
          }
       });
@@ -67,6 +77,7 @@ function projectHandler (db) {
          }
          var updatedProject = result.value;
          delete updatedProject._id;
+         // res.set("Access-Control-Allow-Origin", "*");
          res.json(updatedProject);
       });
    };
